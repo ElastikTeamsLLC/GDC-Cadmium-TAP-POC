@@ -22,8 +22,8 @@ class Tapcadmium(Tap):
         """Return a list of discovered streams."""
         return [
             streams.SubmissionsStream(self),
-            # streams.AuthorsStream(self),
-            # streams.SubmittersStream(self)
+            streams.AuthorsStream(self),
+            streams.SubmittersStream(self)
         ]
 
 
