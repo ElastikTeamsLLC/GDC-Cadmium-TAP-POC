@@ -3,64 +3,101 @@
 from __future__ import annotations
 
 import typing as t
-from importlib import resources
-
+import requests
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_cadmium.client import cadmiumStream
 
-# TODO: Delete this is if not using json files for schema definition
-SCHEMAS_DIR = resources.files(__package__) / "schemas"
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
 
-
-class UsersStream(cadmiumStream):
-    """Define custom stream."""
-
-    name = "users"
-    path = "/users"
-    primary_keys: t.ClassVar[list[str]] = ["id"]
+class SubmissionsStream(cadmiumStream):
+    """Stream for Cadmium Submissions API."""
+    
+    name = "submissions"
+    path = "webservices/api.asp"
+    primary_keys = ["SubmissionID"]
     replication_key = None
-    # Optionally, you may also use `schema_filepath` in place of `schema`:
-    # schema_filepath = SCHEMAS_DIR / "users.json"  # noqa: ERA001
+
     schema = th.PropertiesList(
-        th.Property("name", th.StringType),
-        th.Property(
-            "id",
-            th.StringType,
-            description="The user's system ID",
-        ),
-        th.Property(
-            "age",
-            th.IntegerType,
-            description="The user's age in years",
-        ),
-        th.Property(
-            "email",
-            th.StringType,
-            description="The user's email address",
-        ),
-        th.Property("street", th.StringType),
-        th.Property("city", th.StringType),
-        th.Property(
-            "state",
-            th.StringType,
-            description="State name in ISO 3166-2 format",
-        ),
-        th.Property("zip", th.StringType),
+        th.Property("SubmissionID", th.StringType),
+        th.Property("SubmitterID", th.StringType),
+        th.Property("SubmissionStatus", th.StringType),
+        th.Property("SubmissionDateAdded", th.DateTimeType),
+        th.Property("SubmissionDateCompleted", th.DateTimeType),
+        th.Property("SubmissionTypeID", th.StringType),
+        th.Property("SubmissionCategory", th.StringType),
     ).to_dict()
 
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token: th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getSubmissions",
+            "eID": self.config["eidsub"],
+            "page": next_page_token or 1
+        })
+        return params
+    
+class AuthorsStream(cadmiumStream):
+    """Stream for Cadmium Submissions API."""
+    
+    name = "authors"
+    path = "webservices/api.asp"
+    primary_keys = ["AuthorID"]
+    replication_key = None
 
-class GroupsStream(cadmiumStream):
-    """Define custom stream."""
-
-    name = "groups"
-    path = "/groups"
-    primary_keys: t.ClassVar[list[str]] = ["id"]
-    replication_key = "modified"
     schema = th.PropertiesList(
-        th.Property("name", th.StringType),
-        th.Property("id", th.StringType),
-        th.Property("modified", th.DateTimeType),
+        th.Property("AuthorID", th.StringType),
+        th.Property("AuthorKey", th.StringType),
+        th.Property("AuthorFirstName", th.StringType),
+        th.Property("AuthorLastName", th.StringType),
+        th.Property("AuthorEmail", th.StringType),
+        th.Property("AuthorState", th.StringType),
+        th.Property("AuthorCountry", th.StringType),
+        th.Property("AuthorOrganization", th.StringType),   
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token: th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getAuthors",
+            "eID": self.config["eidaut"],
+            "page": next_page_token or 1
+        })
+        return params
+    
+class SubmittersStream(cadmiumStream):
+    """Stream for Cadmium Submissions API."""
+    
+    name = "submitters"
+    path = "webservices/api.asp"
+    primary_keys = ["SubmitterID"]
+    replication_key = None
+
+    schema = th.PropertiesList(
+        th.Property("SubmitterID", th.StringType),
+        th.Property("SubmitterFirstName", th.StringType),
+        th.Property("SubmitterEmail", th.StringType),
+        th.Property("SubmitterMemberID", th.StringType),
+        th.Property("SubmitterChairRole", th.StringType),
+        th.Property("SubmitterIDExternalSystem", th.StringType),  
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token: th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getSubmitters",
+            "eID": self.config["eidaut"],
+            "page": next_page_token or 1
+        })
+        return params
