@@ -66,11 +66,11 @@ class cadmiumStream(RESTStream):
     #The method below is used to parse the response from the API.
     def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
         data = response.json()
-        current_page = data["metadata"]["page"]
-        total_pages = data["metadata"]["pages"]
+        # current_page = data["metadata"]["page"]
+        # total_pages = data["metadata"]["pages"]
         
-        print(f"\nProcessing page {current_page} of {total_pages}")
-        print(f"Found {len(data.get('results', []))} records on this page\n")
+        # print(f"\nProcessing page {current_page} of {total_pages}")
+        # print(f"Found {len(data.get('results', []))} records on this page\n")
         
         return data.get("results", [])
     

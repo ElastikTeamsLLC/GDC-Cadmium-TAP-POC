@@ -21,9 +21,9 @@ class Tapcadmium(Tap):
     def discover_streams(self) -> list[streams.cadmiumStream]:
         """Return a list of discovered streams."""
         return [
-            streams.SubmissionsStream(self),
+            # streams.SubmissionsStream(self),
             streams.AuthorsStream(self),
-            streams.SubmittersStream(self)
+            # streams.SubmittersStream(self)
         ]
 
 
