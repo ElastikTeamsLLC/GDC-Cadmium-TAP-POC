@@ -41,7 +41,7 @@ class SubmissionsStream(cadmiumStream):
         return params
     
 class AuthorsStream(cadmiumStream):
-    """Stream for Cadmium Submissions API."""
+    """Stream for Cadmium Authors API."""
     
     name = "authors"
     path = "webservices/api.asp"
@@ -73,7 +73,7 @@ class AuthorsStream(cadmiumStream):
         return params
     
 class SubmittersStream(cadmiumStream):
-    """Stream for Cadmium Submissions API."""
+    """Stream for Cadmium Submitters API."""
     
     name = "submitters"
     path = "webservices/api.asp"
@@ -101,3 +101,98 @@ class SubmittersStream(cadmiumStream):
             "page": next_page_token or 1
         })
         return params
+
+class AbstractsStream(cadmiumStream):
+    """Stream for Cadmium Abstracts API."""
+    
+    name = "abstracts"
+    path = "webservices/api.asp"
+    primary_keys = ["AbstractID"]
+    replication_key = None
+
+    schema = th.PropertiesList(
+        th.Property("AbstractID", th.StringType),
+        th.Property("SubmissionID", th.StringType),
+        th.Property("SubmitterID", th.StringType),
+        th.Property("AbstractTopic", th.StringType),
+        th.Property("AbstractText0", th.StringType),
+        th.Property("AbstractTargetAudience", th.StringType),  
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token: th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getAbstracts",
+            "eID": self.config["eidabs"],
+            "page": next_page_token or 1
+        })
+        return params
+    
+    
+class ReviewsStream(cadmiumStream):
+    """Stream for Cadmium Reviews API."""
+    
+    name = "reviews"
+    path = "webservices/api.asp"
+    primary_keys = ["ReviewID"]
+    replication_key = None
+
+    schema = th.PropertiesList(
+        th.Property("ReviewID", th.StringType),
+        th.Property("ReviewDateAdded", th.StringType),
+        th.Property("ReviewDateEdited", th.StringType),
+        th.Property("ReviewSubmissionID", th.StringType),
+        th.Property("ReviewReviewerID", th.StringType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token: th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getReviews",
+            "eID": self.config["eidaut"],
+            "page": next_page_token or 1
+        })
+        return params
+    
+# Requires different API url : https://www.conferenceharvester.com/conferenceportal3/
+# class PresentersStream(cadmiumStream):
+#     """Stream for Cadmium Presenters API."""
+    
+#     name = "presenters"
+#     path = "webservices/HarvesterJsonAPI.asp"
+#     primary_keys = ["ReviewID"]
+#     replication_key = None
+
+#     schema = th.PropertiesList(
+#         th.Property("PresenterID", th.StringType),
+#         th.Property("PresenterDateAdded", th.StringType),
+#         th.Property("PresenterDateEdited", th.StringType),
+#         th.Property("PresenterFirstName", th.StringType),
+#         th.Property("PresenterLastName", th.StringType),
+#         th.Property("PresenterPosition", th.StringType),
+#         th.Property("resenterOrganization", th.StringType),
+#         th.Property("PresenterEmail", th.StringType),
+#         th.Property("PresenterCountry", th.StringType),
+#     ).to_dict()
+
+#     def get_url_params(
+#         self,
+#         context: th.Optional[dict],
+#         next_page_token: th.Optional[th.Any]
+#     ) -> th.Dict[str, th.Any]:
+#         params = super().get_url_params(context, next_page_token)
+#         params.update({
+#             "Method": "getPresenters",
+#             "eID": self.config["eidpre"],
+#             "page": next_page_token or 1
+#         })
+#         return params
+    
