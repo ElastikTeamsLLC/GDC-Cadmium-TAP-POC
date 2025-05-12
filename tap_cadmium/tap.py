@@ -26,7 +26,8 @@ class Tapcadmium(Tap):
             streams.SubmittersStream(self),
             streams.AbstractsStream(self),
             streams.ReviewsStream(self),
-            # streams.PresentersStream(self),
+            streams.PresentersStream(self),
+            streams.PresentationsStream(self),
         ]
 
 

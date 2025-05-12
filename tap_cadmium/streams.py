@@ -162,37 +162,102 @@ class ReviewsStream(cadmiumStream):
         })
         return params
     
-# Requires different API url : https://www.conferenceharvester.com/conferenceportal3/
-# class PresentersStream(cadmiumStream):
-#     """Stream for Cadmium Presenters API."""
-    
-#     name = "presenters"
-#     path = "webservices/HarvesterJsonAPI.asp"
-#     primary_keys = ["ReviewID"]
-#     replication_key = None
+class PresentersStream(cadmiumStream):
+    """Stream for Cadmium Presenters API."""
+    name = "presenters"
+    path = "webservices/HarvesterJsonAPI.asp"
+    replication_key = None
+    records_jsonpath = "$[*]"
 
-#     schema = th.PropertiesList(
-#         th.Property("PresenterID", th.StringType),
-#         th.Property("PresenterDateAdded", th.StringType),
-#         th.Property("PresenterDateEdited", th.StringType),
-#         th.Property("PresenterFirstName", th.StringType),
-#         th.Property("PresenterLastName", th.StringType),
-#         th.Property("PresenterPosition", th.StringType),
-#         th.Property("resenterOrganization", th.StringType),
-#         th.Property("PresenterEmail", th.StringType),
-#         th.Property("PresenterCountry", th.StringType),
-#     ).to_dict()
-
-#     def get_url_params(
-#         self,
-#         context: th.Optional[dict],
-#         next_page_token: th.Optional[th.Any]
-#     ) -> th.Dict[str, th.Any]:
-#         params = super().get_url_params(context, next_page_token)
-#         params.update({
-#             "Method": "getPresenters",
-#             "eID": self.config["eidpre"],
-#             "page": next_page_token or 1
-#         })
-#         return params
+    schema = th.PropertiesList(
+        th.Property("PresenterID", th.StringType),
+        th.Property("PresenterDateAdded", th.StringType),
+        th.Property("PresenterDateEdited", th.StringType),
+        th.Property("PresenterFirstName", th.StringType),
+        th.Property("PresenterLastName", th.StringType),
+        th.Property("PresenterPosition", th.StringType),
+        th.Property("resenterOrganization", th.StringType),
+        th.Property("PresenterEmail", th.StringType),
+        th.Property("PresenterCountry", th.StringType),
+    ).to_dict()
     
+    @property
+    def url_base(self) -> str:
+        """Return the API URL root, configurable via tap settings."""
+        return self.config["pres_url"]
+    
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token : th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getPresenters",
+            "eID": self.config["eidpre"]
+        })
+        return params
+    
+    def get_next_page_token(
+        self,
+        response: requests.Response,
+        previous_token: t.Optional[t.Any]
+    ) -> t.Optional[t.Any]:
+        # No pagination required for this endpoint
+        return None
+
+    
+    def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
+        return response.json()
+
+
+class PresentationsStream(cadmiumStream):
+    """Stream for Cadmium Presentations API."""
+    name = "presentations"
+    path = "webservices/HarvesterJsonAPI.asp"
+    replication_key = None
+    records_jsonpath = "$[*]"
+
+    schema = th.PropertiesList(
+        th.Property("EventName", th.StringType),
+        th.Property("EventID", th.StringType),
+        th.Property("EventKey", th.StringType),
+        th.Property("PresentationID", th.StringType),
+        th.Property("PresentationStatus", th.StringType),
+        th.Property("PresentationDateAdded", th.StringType),
+        th.Property("PresentationDateEdited", th.StringType),
+        th.Property("PresentationDate", th.StringType),
+        th.Property("SessionStartTime", th.StringType),
+        th.Property("SessionEndTime", th.StringType),
+        th.Property("PresentationTitle", th.StringType),
+        th.Property("AbstractText", th.StringType),
+    ).to_dict()
+    
+    @property
+    def url_base(self) -> str:
+        """Return the API URL root, configurable via tap settings."""
+        return self.config["pres_url"]
+    
+    def get_url_params(
+        self,
+        context: th.Optional[dict],
+        next_page_token : th.Optional[th.Any]
+    ) -> th.Dict[str, th.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.update({
+            "Method": "getPresentations",
+            "eID": self.config["eidaut"]
+        })
+        return params
+    
+    def get_next_page_token(
+        self,
+        response: requests.Response,
+        previous_token: t.Optional[t.Any]
+    ) -> t.Optional[t.Any]:
+        # No pagination required for this endpoint
+        return None
+
+    
+    def parse_response(self, response: requests.Response) -> t.Iterable[dict]:
+        return response.json()
