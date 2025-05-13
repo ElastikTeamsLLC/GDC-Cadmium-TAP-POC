@@ -176,7 +176,7 @@ class PresentersStream(cadmiumStream):
         th.Property("PresenterFirstName", th.StringType),
         th.Property("PresenterLastName", th.StringType),
         th.Property("PresenterPosition", th.StringType),
-        th.Property("resenterOrganization", th.StringType),
+        th.Property("PresenterOrganization", th.StringType),
         th.Property("PresenterEmail", th.StringType),
         th.Property("PresenterCountry", th.StringType),
     ).to_dict()
